@@ -16,6 +16,7 @@ public class TransactionService {
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
+
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
