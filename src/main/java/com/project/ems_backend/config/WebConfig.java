@@ -9,8 +9,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/v1")
-                .allowedOrigins("http://localhost:4000") // Or the port Vue app runs on
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:5173") // Or the port Vue app runs on
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*");
     }

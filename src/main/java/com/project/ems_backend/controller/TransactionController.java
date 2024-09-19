@@ -1,10 +1,13 @@
 package com.project.ems_backend.controller;
 
+import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.model.Transaction;
 import com.project.ems_backend.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -42,5 +45,16 @@ public class TransactionController {
     public Transaction updateTransaction(@PathVariable Long id, @RequestBody Transaction transaction){
         return transactionService.updateTransaction(id, transaction);
     }
+
+    @GetMapping("/categories/{type}")
+    public ResponseEntity<List<String>> getCategories(@PathVariable("type") String type) {
+        List<String> categories = Arrays.stream(CategoryType.values())         // converts array into a stream for performing operations like filtering and mapping on it
+                .filter(cat -> cat.getType().name().equalsIgnoreCase(type))           //cat represents each CategoryType value (category) as it is being processed in the stream
+                .map(Enum::name)     //maps each element in the filtered stream to its name of the enum value
+                .toList();
+
+        return ResponseEntity.ok(categories);
+    }
+
 }
 

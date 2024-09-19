@@ -17,5 +17,9 @@ public enum CategoryType {
     CategoryType(TransactionType type) {
         this.type = type;
     }
+
+    public TransactionType getType() {
+        return type;
+    }
 }
 

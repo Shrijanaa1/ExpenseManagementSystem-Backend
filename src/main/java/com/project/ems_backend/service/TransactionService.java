@@ -3,6 +3,9 @@ package com.project.ems_backend.service;
 import com.project.ems_backend.model.Transaction;
 import com.project.ems_backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +20,9 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+
+    public Page<Transaction> getAllTransactions(int page, int size, String sortBy) {
+        return transactionRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
     }
 
     public Transaction getTransactionById(long id) {
