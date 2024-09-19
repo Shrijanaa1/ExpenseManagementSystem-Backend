@@ -3,7 +3,10 @@ package com.project.ems_backend.controller;
 import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.model.Transaction;
 import com.project.ems_backend.service.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +19,21 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
+
     @Autowired
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
     @GetMapping
-    public List<Transaction> getAllTransaction(){
-        return transactionService.getAllTransactions();
+    public Page<Transaction> getAllTransactions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ){
+        logger.info("Fetching transactions with pagination - page: {}, size: {}, sortBy: {}", page, size, sortBy);
+        return transactionService.getAllTransactions(page, size, sortBy);
     }
 
     @GetMapping("/{id}")

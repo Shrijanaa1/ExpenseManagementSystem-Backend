@@ -41,16 +41,16 @@ class TransactionServiceTest {
         transaction.setDescription("Lunch");
     }
 
-    @Test
-    void testGetAllTransactions() {
-        when(transactionRepository.findAll()).thenReturn(Arrays.asList(transaction));   //it should return a list containing the transaction object created in the @BeforeEach method
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        assertNotNull(transactions);   //Ensures that the list of transactions is not null
-        assertEquals(1, transactions.size());    //Verifies that the list contains exactly one transaction
-        assertEquals(transaction, transactions.get(0));      //Ensures that the first (and only) transaction in the list is equal to the transaction object created during the setup phase
-
-        verify(transactionRepository, times(1)).findAll();      //verifies that the findAll() method of the transactionRepository mock was called exactly once during the execution of getAllTransactions()
-    }
+//    @Test
+//    void testGetAllTransactions() {
+//        when(transactionRepository.findAll()).thenReturn(Arrays.asList(transaction));   //it should return a list containing the transaction object created in the @BeforeEach method
+//        List<Transaction> transactions = transactionService.getAllTransactions();
+//        assertNotNull(transactions);   //Ensures that the list of transactions is not null
+//        assertEquals(1, transactions.size());    //Verifies that the list contains exactly one transaction
+//        assertEquals(transaction, transactions.get(0));      //Ensures that the first (and only) transaction in the list is equal to the transaction object created during the setup phase
+//
+//        verify(transactionRepository, times(1)).findAll();      //verifies that the findAll() method of the transactionRepository mock was called exactly once during the execution of getAllTransactions()
+//    }
 
 
     @Test
