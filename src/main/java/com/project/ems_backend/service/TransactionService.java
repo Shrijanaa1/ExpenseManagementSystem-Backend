@@ -19,8 +19,8 @@ public class TransactionService {
     }
 
     //With pagination only
-    public Page<Transaction> getAllTransactions(int page, int size, String sortBy) {
-        return transactionRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
+    public Page<Transaction> getAllTransactions(int page, int size, String sortBy) { // //Page is Spring Data interface that encapsulates pagination logic
+        return transactionRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy))); //PageRequest creates Pageable object, used by repository to fetch specific page of data with certain size and sorting
     }
 
 
