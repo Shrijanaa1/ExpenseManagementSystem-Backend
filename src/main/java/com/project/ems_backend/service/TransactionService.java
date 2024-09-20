@@ -3,10 +3,10 @@ package com.project.ems_backend.service;
 import com.project.ems_backend.model.Transaction;
 import com.project.ems_backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -18,9 +18,25 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-
+    //With pagination only
     public Page<Transaction> getAllTransactions(int page, int size, String sortBy) {
         return transactionRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
+    }
+
+
+    public Page<Transaction> getFilteredTransactions(int page, int size, String sortBy, Long id, String description) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        //check if id or description filter is applied
+        if(id!= null){
+            Transaction transaction = transactionRepository.findById(id).orElse(null);
+            return new PageImpl<>(transaction == null ? List.of() : List.of(transaction), pageable, 1);
+
+        }else if(description != null){
+            return transactionRepository.findByDescriptionContaining(description,pageable);
+        }else {
+            return transactionRepository.findAll(pageable);
+        }
     }
 
     public Transaction getTransactionById(long id) {
