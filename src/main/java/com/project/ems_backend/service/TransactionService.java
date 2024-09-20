@@ -32,7 +32,7 @@ public class TransactionService {
             Transaction transaction = transactionRepository.findById(id).orElse(null);
             return new PageImpl<>(transaction == null ? List.of() : List.of(transaction), pageable, 1);
 
-        }else if(description != null){
+        }else if(description != null && !description.isEmpty()){ //check for empty string
             return transactionRepository.findByDescriptionContaining(description,pageable);
         }else {
             return transactionRepository.findAll(pageable);
