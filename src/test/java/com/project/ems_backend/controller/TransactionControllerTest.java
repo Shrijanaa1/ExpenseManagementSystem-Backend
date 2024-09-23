@@ -46,6 +46,22 @@ class TransactionControllerTest {
         transaction.setDescription("Groceries");
     }
 
+    @Test
+    void testGetTransactionById() throws Exception {
+        //Mock the service to return the transaction when called with ID 1L
+        when(transactionService.getTransactionById(1L)).thenReturn(transaction);
+
+        //Simulate GET request to /api/transactions/1
+        mockMvc.perform(get("/api/transactions/{id}", 1L)
+                            .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()) //Check that the response status is 200 OK
+                .andExpect(jsonPath("$.id").value(transaction.getId())) //Verify the ID
+                .andExpect(jsonPath("$.amount").value(transaction.getAmount().intValue())) // Verify the amount
+                .andExpect(jsonPath("$.type").value(transaction.getType().toString())) // Verify the type
+                .andExpect(jsonPath("$.category").value(transaction.getCategory().toString())) // Verify the category
+                .andExpect(jsonPath("$.description").value(transaction.getDescription())); // Verify the description
+    }
+
 
     @Test
     void testCreateTransaction() throws Exception {
