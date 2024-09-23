@@ -27,7 +27,7 @@ public class TransactionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) Long id, //for filtering transaction by id, optional
             @RequestParam(required = false) String description
     ){
         return transactionService.getFilteredTransactions(page, size, sortBy, id, description);

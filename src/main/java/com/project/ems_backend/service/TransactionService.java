@@ -25,12 +25,12 @@ public class TransactionService {
 
 
     public Page<Transaction> getFilteredTransactions(int page, int size, String sortBy, Long id, String description) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy)); //Controls how many result and which page to fetch
 
         //check if id or description filter is applied
         if(id!= null){
             Transaction transaction = transactionRepository.findById(id).orElse(null);
-            return new PageImpl<>(transaction == null ? List.of() : List.of(transaction), pageable, 1);
+            return new PageImpl<>(transaction == null ? List.of() : List.of(transaction), pageable, 1); //If transaction is found, returns single-item list else empty list is returned
 
         }else if(description != null && !description.isEmpty()){ //check for empty string
             return transactionRepository.findByDescriptionContaining(description,pageable);
