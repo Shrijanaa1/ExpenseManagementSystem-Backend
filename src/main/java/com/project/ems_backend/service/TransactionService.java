@@ -23,21 +23,27 @@ public class TransactionService {
         return transactionRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy))); //PageRequest creates Pageable object, used by repository to fetch specific page of data with certain size and sorting
     }
 
+    public Page<Transaction> getFilteredTransactions(int page, int size, String sortBy, Long id, String description, String filterType) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy)); //Pagination object to define pagination and sorting behaviour
 
-    public Page<Transaction> getFilteredTransactions(int page, int size, String sortBy, Long id, String description) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy)); //Controls how many result and which page to fetch
-
-        //check if id or description filter is applied
-        if(id!= null){
+        if (id != null) {
             Transaction transaction = transactionRepository.findById(id).orElse(null);
-            return new PageImpl<>(transaction == null ? List.of() : List.of(transaction), pageable, 1); //If transaction is found, returns single-item list else empty list is returned
+            return new PageImpl<>(transaction == null ? List.of() : List.of(transaction), pageable, 1); //if transaction is null, returns an empty list else returns a list with single transaction // 1 indicates that the total number of elements is 1
 
-        }else if(description != null && !description.isEmpty()){ //check for empty string
-            return transactionRepository.findByDescriptionContaining(description,pageable);
-        }else {
+        } else if (description != null ) {
+            return switch (filterType) {
+                case "contains" -> transactionRepository.findByDescriptionContaining(description, pageable);
+                case "startsWith" -> transactionRepository.findByDescriptionStartingWith(description, pageable);
+                case "endsWith" -> transactionRepository.findByDescriptionEndingWith(description, pageable);
+                case "equals" -> transactionRepository.findByDescriptionEquals(description, pageable);
+
+                default -> transactionRepository.findAll(pageable);
+            };
+        } else {
             return transactionRepository.findAll(pageable);
         }
     }
+
 
     public Transaction getTransactionById(long id) {
         return transactionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Transaction not found with id: " + id));
