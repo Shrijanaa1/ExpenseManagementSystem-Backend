@@ -36,7 +36,8 @@ public class TransactionService {
                 case "startsWith" -> transactionRepository.findByDescriptionStartingWith(description, pageable);
                 case "endsWith" -> transactionRepository.findByDescriptionEndingWith(description, pageable);
                 case "equals" -> transactionRepository.findByDescriptionEquals(description, pageable);
-
+                case "notEquals" -> transactionRepository.findByDescriptionNotEquals(description, pageable);
+                case "notContains" -> transactionRepository.findByDescriptionNotContains(description, pageable);
                 default -> transactionRepository.findAll(pageable);
             };
         } else {
