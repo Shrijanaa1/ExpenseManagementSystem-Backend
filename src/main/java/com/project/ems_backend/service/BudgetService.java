@@ -23,7 +23,7 @@ public class BudgetService {
         return budgetRepository.save(budget);
     }
 
-    public void deleteBudgetById(long id) {
+    public void deleteBudget(Long id) {
         budgetRepository.deleteById(id);
     }
 
