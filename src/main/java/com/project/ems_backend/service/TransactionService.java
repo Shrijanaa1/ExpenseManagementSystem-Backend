@@ -2,6 +2,7 @@ package com.project.ems_backend.service;
 
 import com.project.ems_backend.model.Budget;
 import com.project.ems_backend.model.Transaction;
+import com.project.ems_backend.model.TransactionType;
 import com.project.ems_backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -57,7 +58,14 @@ public class TransactionService {
     }
 
     public Transaction saveTransaction(Transaction transaction) {
-        return transactionRepository.save(transaction);
+        //save the transaction
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        //update the budget remainingAmount if its an expense
+        if(transaction.getType() == TransactionType.EXPENSE){
+            updateRemainingAmountForBudgets(transaction);
+        }
+        return savedTransaction;
     }
 
     public void deleteTransaction(Long id) {
@@ -84,6 +92,17 @@ public class TransactionService {
             budget.setRemainingAmount(remainingAmount);
 
             //Save the updated budget
+            budgetService.saveBudget(budget);
+        }
+    }
+
+    public void reverseRemainingAmountForBudgets(Transaction transaction) {
+        Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
+
+        if (budget != null) {
+            // Add back the transaction amount to reverse its effect on the budget
+            BigDecimal remainingAmount = budget.getRemainingAmount().add(transaction.getAmount());
+            budget.setRemainingAmount(remainingAmount);
             budgetService.saveBudget(budget);
         }
     }
