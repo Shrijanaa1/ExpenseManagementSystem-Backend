@@ -74,12 +74,25 @@ public class TransactionService {
 
     public Transaction updateTransaction(Long id, Transaction updatedTransaction) {
         Transaction existingTransaction = getTransactionById(id);
+
+        // Reverse the impact of the original transaction before applying new values
+        if (existingTransaction.getType() == TransactionType.EXPENSE) {
+            reverseRemainingAmountForBudgets(existingTransaction);
+        }
+
         existingTransaction.setAmount(updatedTransaction.getAmount());
         existingTransaction.setCategory(updatedTransaction.getCategory());
         existingTransaction.setDescription(updatedTransaction.getDescription());
         existingTransaction.setType(updatedTransaction.getType());
 
-        return transactionRepository.save(existingTransaction);
+        //save the updated transaction
+        Transaction savedTransaction = transactionRepository.save(existingTransaction);
+
+        //If the transaction is an expense, update the remaining amount
+        if(updatedTransaction.getType() == TransactionType.EXPENSE){
+            updateRemainingAmountForBudgets(savedTransaction);
+        }
+        return savedTransaction;
     }
 
     //Calculate total amount spent by category and update the remaining amount in the BudgetList
