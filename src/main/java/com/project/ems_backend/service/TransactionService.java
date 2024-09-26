@@ -1,6 +1,7 @@
 package com.project.ems_backend.service;
 
 import com.project.ems_backend.model.Budget;
+import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.model.Transaction;
 import com.project.ems_backend.model.TransactionType;
 import com.project.ems_backend.repository.TransactionRepository;
@@ -136,6 +137,13 @@ public class TransactionService {
         }catch (IllegalArgumentException e){
             System.out.println("No budget found for category: " + transaction.getCategory() + ". Skipping budget update.");
         }
+    }
+
+    public BigDecimal calculateTotalExpensesForCategory(CategoryType category) {
+        List<Transaction> expenses = transactionRepository.findByCategoryAndType(category, TransactionType.EXPENSE);
+        return expenses.stream()
+                        .map(Transaction::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add); //Sum all amounts
     }
 
 }

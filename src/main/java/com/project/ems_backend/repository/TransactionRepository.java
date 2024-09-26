@@ -1,11 +1,15 @@
 package com.project.ems_backend.repository;
 
+import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.model.Transaction;
+import com.project.ems_backend.model.TransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
@@ -31,5 +35,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM Transaction t WHERE LOWER(t.description) NOT LIKE LOWER(CONCAT('%', :description, '%' ))")
     Page<Transaction> findByDescriptionNotContains(String description, Pageable pageable);
+
+    List<Transaction> findByCategoryAndType(CategoryType category, TransactionType type);
 
 }
