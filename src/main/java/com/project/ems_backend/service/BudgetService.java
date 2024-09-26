@@ -1,6 +1,7 @@
 package com.project.ems_backend.service;
 
 import com.project.ems_backend.model.Budget;
+import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,11 @@ public class BudgetService {
     }
 
     public Budget saveBudget(Budget budget) {
+        // Initialize remainingAmount to budgetLimit if it's a new budget
+        if(budget.getId() == null){
+            budget.setRemainingAmount(budget.getBudgetLimit());
+        }
+
         return budgetRepository.save(budget);
     }
 
@@ -35,4 +41,12 @@ public class BudgetService {
         existingBudget.setEndDate(updatedBudget.getEndDate());
         return budgetRepository.save(existingBudget);
     }
+
+    //method to get budget by category
+    public Budget getBudgetByCategory(CategoryType category) {
+        return budgetRepository.findByCategory(category)
+                .orElseThrow(() -> new IllegalArgumentException("Budget not found for category: " + category));
+    }
+
+
 }
