@@ -47,6 +47,10 @@ public class BudgetService {
         existingBudget.setBudgetLimit(updatedBudget.getBudgetLimit());
         existingBudget.setStartDate(updatedBudget.getStartDate());
         existingBudget.setEndDate(updatedBudget.getEndDate());
+
+        //Update remaining amount based on new budget limit
+        existingBudget.setRemainingAmount(updatedBudget.getBudgetLimit());
+
         return budgetRepository.save(existingBudget);
     }
 
@@ -55,6 +59,5 @@ public class BudgetService {
         return budgetRepository.findByCategory(category)
                 .orElseThrow(() -> new IllegalArgumentException("Budget not found for category: " + category));
     }
-
 
 }
