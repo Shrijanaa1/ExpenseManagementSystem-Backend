@@ -97,15 +97,20 @@ public class TransactionService {
 
     //Calculate total amount spent by category and update the remaining amount in the BudgetList
     public void updateRemainingAmountForBudgets(Transaction transaction){
-        Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
+        try {
+            Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
 
-        if(budget != null){
-            //Subtract the transaction amount form remaining amount
-            BigDecimal remainingAmount = budget.getRemainingAmount().subtract(transaction.getAmount());
-            budget.setRemainingAmount(remainingAmount);
+            if (budget != null) {
+                //Subtract the transaction amount form remaining amount
+                BigDecimal remainingAmount = budget.getRemainingAmount().subtract(transaction.getAmount());
+                budget.setRemainingAmount(remainingAmount);
 
-            //Save the updated budget
-            budgetService.saveBudget(budget);
+                //Save the updated budget
+                budgetService.saveBudget(budget);
+            }
+        }catch(IllegalArgumentException e){
+            // No budget found for this category, so we skip updating the budget
+            System.out.println("No budget found for category: " + transaction.getCategory() + ". Skipping budget update.");
         }
     }
 
