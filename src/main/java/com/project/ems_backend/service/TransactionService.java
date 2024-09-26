@@ -69,6 +69,15 @@ public class TransactionService {
     }
 
     public void deleteTransaction(Long id) {
+        //Fetching transaction to see if its expense
+        Transaction transactionToDelete = getTransactionById(id);
+
+        //If transaction is expense, reverse its effect on the budget
+        if(transactionToDelete.getType() == TransactionType.EXPENSE){
+            reverseRemainingAmountForBudgets(transactionToDelete);
+        }
+
+        //Now delete the transaction
         transactionRepository.deleteById(id);
     }
 
