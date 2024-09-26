@@ -9,19 +9,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
+
 
 @Service
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
-    private final TransactionService transactionService;
 
     @Autowired
-    public BudgetService(BudgetRepository budgetRepository, TransactionService transactionService) {
+    public BudgetService(BudgetRepository budgetRepository) {
         this.budgetRepository = budgetRepository;
-        this.transactionService = transactionService;
+    }
+
+    // Fetch all budgets without pagination (used by TransactionService)
+    public List<Budget> getAllBudgetsWithoutPagination() {
+        return budgetRepository.findAll();
     }
 
     public Budget getBudgetById(long id) {
@@ -64,17 +67,5 @@ public class BudgetService {
         return budgetRepository.findByCategory(category)
                 .orElseThrow(() -> new IllegalArgumentException("Budget not found for category: " + category));
     }
-
-    public void updateAllBudgetsRemainingAmounts() {
-        List<Budget> allBudgets = budgetRepository.findAll();
-
-        for (Budget budget : allBudgets) {
-            BigDecimal totalExpenses = transactionService.calculateTotalExpensesForCategory(budget.getCategory());
-            BigDecimal updatedRemainingAmount = budget.getBudgetLimit().subtract(totalExpenses);
-            budget.setRemainingAmount(updatedRemainingAmount);
-            saveBudget(budget); // Save updated budget
-        }
-    }
-
 
 }

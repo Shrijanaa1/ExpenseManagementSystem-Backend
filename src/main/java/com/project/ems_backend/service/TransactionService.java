@@ -146,4 +146,19 @@ public class TransactionService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add); //Sum all amounts
     }
 
+    public void updateAllBudgetsRemainingAmounts() {
+        // Fetch all budgets
+        List<Budget> allBudgets = budgetService.getAllBudgetsWithoutPagination();
+
+        // Update the remaining amount for each budget
+        for (Budget budget : allBudgets) {
+            BigDecimal totalExpenses = calculateTotalExpensesForCategory(budget.getCategory());
+            BigDecimal updatedRemainingAmount = budget.getBudgetLimit().subtract(totalExpenses);
+            budget.setRemainingAmount(updatedRemainingAmount);
+
+            // Save the updated budget
+            budgetService.saveBudget(budget);
+        }
+    }
+
 }
