@@ -1,22 +1,28 @@
 package com.project.ems_backend.service;
 
+import com.project.ems_backend.model.Budget;
 import com.project.ems_backend.model.Transaction;
 import com.project.ems_backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final BudgetService budgetService;
+
 
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository, BudgetService budgetService) {
         this.transactionRepository = transactionRepository;
+        this.budgetService = budgetService;
     }
+
 
     //With pagination only
     public Page<Transaction> getAllTransactions(int page, int size, String sortBy) { // //Page is Spring Data interface that encapsulates pagination logic
@@ -66,6 +72,20 @@ public class TransactionService {
         existingTransaction.setType(updatedTransaction.getType());
 
         return transactionRepository.save(existingTransaction);
+    }
+
+    //Calculate total amount spent by category and update the remaining amount in the BudgetList
+    public void updateRemainingAmountForBudgets(Transaction transaction){
+        Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
+
+        if(budget != null){
+            //Subtract the transaction amount form remaining amount
+            BigDecimal remainingAmount = budget.getRemainingAmount().subtract(transaction.getAmount());
+            budget.setRemainingAmount(remainingAmount);
+
+            //Save the updated budget
+            budgetService.saveBudget(budget);
+        }
     }
 
 }
