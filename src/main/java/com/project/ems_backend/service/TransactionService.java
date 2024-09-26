@@ -115,13 +115,17 @@ public class TransactionService {
     }
 
     public void reverseRemainingAmountForBudgets(Transaction transaction) {
-        Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
+        try {
+            Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
 
-        if (budget != null) {
-            // Add back the transaction amount to reverse its effect on the budget
-            BigDecimal remainingAmount = budget.getRemainingAmount().add(transaction.getAmount());
-            budget.setRemainingAmount(remainingAmount);
-            budgetService.saveBudget(budget);
+            if (budget != null) {
+                // Add back the transaction amount to reverse its effect on the budget
+                BigDecimal remainingAmount = budget.getRemainingAmount().add(transaction.getAmount());
+                budget.setRemainingAmount(remainingAmount);
+                budgetService.saveBudget(budget);
+            }
+        }catch (IllegalArgumentException e){
+            System.out.println("No budget found for category: " + transaction.getCategory() + ". Skipping budget update.");
         }
     }
 
