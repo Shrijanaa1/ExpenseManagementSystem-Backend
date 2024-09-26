@@ -1,15 +1,11 @@
 package com.project.ems_backend.service;
 
-import com.project.ems_backend.model.Budget;
-import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.model.Transaction;
-import com.project.ems_backend.model.TransactionType;
 import com.project.ems_backend.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -59,106 +55,40 @@ public class TransactionService {
     }
 
     public Transaction saveTransaction(Transaction transaction) {
-        //save the transaction
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        //update the budget remainingAmount if its an expense
-        if(transaction.getType() == TransactionType.EXPENSE){
-            updateRemainingAmountForBudgets(transaction);
-        }
+        // Delegate to BudgetService to update the budget
+        budgetService.updateBudgetForTransaction(savedTransaction);
+
         return savedTransaction;
     }
 
     public void deleteTransaction(Long id) {
-        //Fetching transaction to see if its expense
         Transaction transactionToDelete = getTransactionById(id);
 
-        //If transaction is expense, reverse its effect on the budget
-        if(transactionToDelete.getType() == TransactionType.EXPENSE){
-            reverseRemainingAmountForBudgets(transactionToDelete);
-        }
+        // Reverse the budget effect before deletion
+        budgetService.reverseBudgetForTransaction(transactionToDelete);
 
-        //Now delete the transaction
+        // Now delete the transaction
         transactionRepository.deleteById(id);
     }
 
     public Transaction updateTransaction(Long id, Transaction updatedTransaction) {
         Transaction existingTransaction = getTransactionById(id);
 
-        // Reverse the impact of the original transaction before applying new values
-        if (existingTransaction.getType() == TransactionType.EXPENSE) {
-            reverseRemainingAmountForBudgets(existingTransaction);
-        }
+        // Reverse the original transaction's impact on the budget
+        budgetService.reverseBudgetForTransaction(existingTransaction);
 
         existingTransaction.setAmount(updatedTransaction.getAmount());
         existingTransaction.setCategory(updatedTransaction.getCategory());
         existingTransaction.setDescription(updatedTransaction.getDescription());
         existingTransaction.setType(updatedTransaction.getType());
 
-        //save the updated transaction
         Transaction savedTransaction = transactionRepository.save(existingTransaction);
 
-        //If the transaction is an expense, update the remaining amount
-        if(updatedTransaction.getType() == TransactionType.EXPENSE){
-            updateRemainingAmountForBudgets(savedTransaction);
-        }
+        // Update budget for the new transaction
+        budgetService.updateBudgetForTransaction(savedTransaction);
+
         return savedTransaction;
     }
-
-    //Calculate total amount spent by category and update the remaining amount in the BudgetList
-    public void updateRemainingAmountForBudgets(Transaction transaction){
-        try {
-            Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
-
-            if (budget != null) {
-                //Subtract the transaction amount form remaining amount
-                BigDecimal remainingAmount = budget.getRemainingAmount().subtract(transaction.getAmount());
-                budget.setRemainingAmount(remainingAmount);
-
-                //Save the updated budget
-                budgetService.saveBudget(budget);
-            }
-        }catch(IllegalArgumentException e){
-            // No budget found for this category, so we skip updating the budget
-            System.out.println("No budget found for category: " + transaction.getCategory() + ". Skipping budget update.");
-        }
-    }
-
-    public void reverseRemainingAmountForBudgets(Transaction transaction) {
-        try {
-            Budget budget = budgetService.getBudgetByCategory(transaction.getCategory());
-
-            if (budget != null) {
-                // Add back the transaction amount to reverse its effect on the budget
-                BigDecimal remainingAmount = budget.getRemainingAmount().add(transaction.getAmount());
-                budget.setRemainingAmount(remainingAmount);
-                budgetService.saveBudget(budget);
-            }
-        }catch (IllegalArgumentException e){
-            System.out.println("No budget found for category: " + transaction.getCategory() + ". Skipping budget update.");
-        }
-    }
-
-    public BigDecimal calculateTotalExpensesForCategory(CategoryType category) {
-        List<Transaction> expenses = transactionRepository.findByCategoryAndType(category, TransactionType.EXPENSE);
-        return expenses.stream()
-                        .map(Transaction::getAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add); //Sum all amounts
-    }
-
-    public void updateAllBudgetsRemainingAmounts() {
-        // Fetch all budgets
-        List<Budget> allBudgets = budgetService.getAllBudgetsWithoutPagination();
-
-        // Update the remaining amount for each budget
-        for (Budget budget : allBudgets) {
-            BigDecimal totalExpenses = calculateTotalExpensesForCategory(budget.getCategory());
-            BigDecimal updatedRemainingAmount = budget.getBudgetLimit().subtract(totalExpenses);
-            budget.setRemainingAmount(updatedRemainingAmount);
-
-            // Save the updated budget
-            budgetService.saveBudget(budget);
-        }
-    }
-
 }

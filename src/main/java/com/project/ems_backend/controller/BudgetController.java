@@ -3,7 +3,6 @@ package com.project.ems_backend.controller;
 import com.project.ems_backend.model.Budget;
 import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.service.BudgetService;
-import com.project.ems_backend.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +15,10 @@ import java.util.List;
 @RequestMapping("api/budgets")
 public class BudgetController {
     private final BudgetService budgetService;
-    private final TransactionService transactionService;
 
     @Autowired
-    public BudgetController(BudgetService budgetService, TransactionService transactionService) {
+    public BudgetController(BudgetService budgetService) {
         this.budgetService = budgetService;
-        this.transactionService = transactionService;
     }
 
     @GetMapping("/{id}")
@@ -56,7 +53,7 @@ public class BudgetController {
 
     @PostMapping("/reload")
     public ResponseEntity<Void> reloadBudgets(){
-        transactionService.updateAllBudgetsRemainingAmounts();
+        budgetService.updateAllBudgetsRemainingAmounts();
         return ResponseEntity.ok().build();
     }
 
