@@ -4,6 +4,9 @@ import com.project.ems_backend.model.Budget;
 import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +22,11 @@ public class BudgetService {
     public Budget getBudgetById(long id) {
         return budgetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Budget not found with id: " + id));
     }
+
+    public Page<Budget> getAllBudgets(int page, int size, String sortBy) { // //Page is Spring Data interface that encapsulates pagination logic
+        return budgetRepository.findAll(PageRequest.of(page, size, Sort.by(sortBy)));
+    }
+
 
     public Budget saveBudget(Budget budget) {
         // Initialize remainingAmount to budgetLimit if it's a new budget

@@ -4,6 +4,7 @@ import com.project.ems_backend.model.Budget;
 import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,16 @@ public class BudgetController {
     public Budget getBudgetById(@PathVariable("id") long id) {
         return budgetService.getBudgetById(id);
     }
+
+    @GetMapping
+    public Page<Budget> getAllBudgets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ){
+        return budgetService.getAllBudgets(page, size, sortBy);
+    }
+
 
     @PostMapping
     public Budget createBudget(@RequestBody Budget budget){
