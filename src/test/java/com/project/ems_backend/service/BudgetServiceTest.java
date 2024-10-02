@@ -7,8 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,4 +57,16 @@ class BudgetServiceTest {
         verify(budgetRepository, times(1)).findById(1L);
     }
 
+
+    @Test
+    void getAllBudgets() {
+        Budget budget = new Budget();
+        Page<Budget> budgetPage = new PageImpl<>(Collections.singletonList(budget));
+        when(budgetRepository.findAll(any(PageRequest.class))).thenReturn(budgetPage);
+
+        Page<Budget> result = budgetService.getAllBudgets(0, 10, "category");
+
+        assertEquals(1, result.getTotalElements());
+        verify(budgetRepository, times(1)).findAll(any(PageRequest.class));
+    }
 }
