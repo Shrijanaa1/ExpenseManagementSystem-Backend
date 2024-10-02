@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -69,4 +70,19 @@ class BudgetServiceTest {
         assertEquals(1, result.getTotalElements());
         verify(budgetRepository, times(1)).findAll(any(PageRequest.class));
     }
+
+    @Test
+    void saveBudget() {
+        Budget budget = new Budget();
+        budget.setBudgetLimit(BigDecimal.valueOf(1000));
+        when(budgetRepository.save(any(Budget.class))).thenReturn(budget);
+
+        Budget result = budgetService.saveBudget(budget);
+
+        assertEquals(BigDecimal.valueOf(1000), result.getRemainingAmount());
+        verify(budgetRepository, times(1)).save(budget);
+    }
+
+
+
 }
