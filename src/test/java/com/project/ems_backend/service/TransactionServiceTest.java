@@ -86,61 +86,25 @@ class TransactionServiceTest {
     }
 
 
+    @Test
+    void testUpdateTransaction() {
+        Transaction updatedTransaction = new Transaction();
+        updatedTransaction.setAmount(BigDecimal.valueOf(150.00));
+        updatedTransaction.setType(TransactionType.INCOME);
+        updatedTransaction.setCategory(CategoryType.FREELANCING);
+        updatedTransaction.setDescription("Project");
 
+        when(transactionRepository.findById(1L)).thenReturn(Optional.of(transaction));
+        when(transactionRepository.save(transaction)).thenReturn(transaction);
 
+        Transaction result = transactionService.updateTransaction(1L, updatedTransaction);
+        assertEquals(BigDecimal.valueOf(150.00), result.getAmount());
+        assertEquals(TransactionType.INCOME, result.getType());
+        assertEquals(CategoryType.FREELANCING, result.getCategory());
+        assertEquals("Project", result.getDescription());
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    @Test
-//    void testGetTransactionById_NotFound() {
-//        when (transactionRepository.findById(1L)).thenReturn(Optional.empty());
-//
-//        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-//            transactionService.getTransactionById(1L);
-//        });
-//
-//        String expectedMessage = "Transaction not found with id: 1";
-//        String actualMessage = exception.getMessage();
-//
-//        assertTrue(actualMessage.contains(expectedMessage));
-//        verify(transactionRepository, times(1)).findById(1L);
-//
-//    }
-
-//    @Test
-//    void testUpdateTransaction() {
-//        Transaction updatedTransaction = new Transaction();
-//        updatedTransaction.setAmount(BigDecimal.valueOf(150.00));
-//        updatedTransaction.setType(TransactionType.INCOME);
-//        updatedTransaction.setCategory(CategoryType.FREELANCING);
-//        updatedTransaction.setDescription("Project");
-//
-//        when(transactionRepository.findById(1L)).thenReturn(Optional.of(transaction));
-//        when(transactionRepository.save(transaction)).thenReturn(transaction);
-//
-//        Transaction result = transactionService.updateTransaction(1L, updatedTransaction);
-//        assertEquals(BigDecimal.valueOf(150.00), result.getAmount());
-//        assertEquals(TransactionType.INCOME, result.getType());
-//        assertEquals(CategoryType.FREELANCING, result.getCategory());
-//        assertEquals("Project", result.getDescription());
-//
-//        verify(transactionRepository, times(1)).findById(1L);
-//        verify(transactionRepository, times(1)).save(transaction);
-//
-//    }
+        verify(transactionRepository, times(1)).findById(1L);
+        verify(transactionRepository, times(1)).save(transaction);
+    }
 
 }
