@@ -128,5 +128,21 @@ class BudgetServiceTest {
         assertEquals(BigDecimal.valueOf(1500), budget.getRemainingAmount()); // Check if the remaining amount is calculated correctly
     }
 
+    @Test
+    void updateAllBudgetsRemainingAmount(){
+        Budget budget1 = new Budget();
+        budget1.setBudgetLimit(BigDecimal.valueOf(1000));
+
+        Budget budget2 = new Budget();
+        budget2.setBudgetLimit(BigDecimal.valueOf(2000));
+
+        List<Budget> budgets = Arrays.asList(budget1, budget2);
+        when(budgetRepository.findAll()).thenReturn(budgets);
+
+        budgetService.updateAllBudgetsRemainingAmounts();
+
+        verify(budgetRepository, times(1)).findAll();
+        verify(budgetRepository, times(2)).save(any(Budget.class));
+    }
 
 }

@@ -91,7 +91,10 @@ public class BudgetService {
     // Update all budgets remaining amounts (batch process)
     public void updateAllBudgetsRemainingAmounts() {
         List<Budget> allBudgets = getAllBudgetsWithoutPagination();
-        allBudgets.forEach(this::updateRemainingAmount); //applies the updateRemainingAmount method to every budget in the allBudgets list. :: method reference
+        allBudgets.forEach(budget -> {
+            updateRemainingAmount(budget);
+            saveBudget(budget);
+                }); //applies the updateRemainingAmount method to every budget in the allBudgets list and persist the updated budget
     }
 
     // Update budget when transaction is saved
