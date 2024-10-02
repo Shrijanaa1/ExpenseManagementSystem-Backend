@@ -52,7 +52,7 @@ public class BudgetController {
     }
 
     @PostMapping("/reload")
-    public ResponseEntity<Void> reloadBudgets(){
+    public ResponseEntity<Void> reloadBudgets(){   //void means there will be no data returned in the HTTP response body
         budgetService.updateAllBudgetsRemainingAmounts();
         return ResponseEntity.ok().build();
     }

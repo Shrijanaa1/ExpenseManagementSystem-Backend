@@ -59,7 +59,6 @@ public class TransactionService {
 
         // Delegate to BudgetService to update the budget
         budgetService.updateBudgetForTransaction(savedTransaction);
-
         return savedTransaction;
     }
 

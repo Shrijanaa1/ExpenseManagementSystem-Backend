@@ -84,21 +84,21 @@ public class BudgetService {
     public BigDecimal calculateTotalExpensesForCategory(CategoryType category) {
         List<Transaction> expenses = transactionRepository.findByCategoryAndType(category, TransactionType.EXPENSE);
         return expenses.stream()
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(Transaction::getAmount) //for each Transaction, map its amount
+                .reduce(BigDecimal.ZERO, BigDecimal::add); //sums up all the transaction amounts, starting with zero
     }
 
     // Update all budgets remaining amounts (batch process)
     public void updateAllBudgetsRemainingAmounts() {
         List<Budget> allBudgets = getAllBudgetsWithoutPagination();
-        allBudgets.forEach(this::updateRemainingAmount);
+        allBudgets.forEach(this::updateRemainingAmount); //applies the updateRemainingAmount method to every budget in the allBudgets list. :: method reference
     }
 
     // Update budget when transaction is saved
     public void updateBudgetForTransaction(Transaction transaction) {
-        if (transaction.getType() == TransactionType.EXPENSE) {
-            Budget budget = getBudgetByCategory(transaction.getCategory());
-            updateRemainingAmount(budget);
+        if (transaction.getType() == TransactionType.EXPENSE) { // Check if the transaction is an expense
+            Budget budget = getBudgetByCategory(transaction.getCategory()); // Get the budget for the same category
+            updateRemainingAmount(budget); // Update the remaining amount in the budget
         }
     }
 
