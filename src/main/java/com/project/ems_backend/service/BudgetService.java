@@ -77,7 +77,7 @@ public class BudgetService {
     public void updateRemainingAmount(Budget budget) {
         BigDecimal totalExpenses = calculateTotalExpensesForCategory(budget.getCategory());
         budget.setRemainingAmount(budget.getBudgetLimit().subtract(totalExpenses));
-        saveBudget(budget);
+//        saveBudget(budget);
     }
 
     // Calculate total expenses for a specific category
@@ -99,6 +99,7 @@ public class BudgetService {
         if (transaction.getType() == TransactionType.EXPENSE) { // Check if the transaction is an expense
             Budget budget = getBudgetByCategory(transaction.getCategory()); // Get the budget for the same category
             updateRemainingAmount(budget); // Update the remaining amount in the budget
+            saveBudget(budget); //save after updating budget
         }
     }
 
@@ -107,6 +108,7 @@ public class BudgetService {
         if (transaction.getType() == TransactionType.EXPENSE) {
             Budget budget = getBudgetByCategory(transaction.getCategory());
             updateRemainingAmount(budget);
+            saveBudget(budget); //Save after reversing
         }
     }
 }

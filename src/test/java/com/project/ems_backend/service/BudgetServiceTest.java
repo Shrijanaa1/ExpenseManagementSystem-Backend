@@ -1,7 +1,9 @@
 package com.project.ems_backend.service;
 
 import com.project.ems_backend.model.Budget;
+import com.project.ems_backend.model.CategoryType;
 import com.project.ems_backend.repository.BudgetRepository;
+import com.project.ems_backend.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -24,6 +26,9 @@ class BudgetServiceTest {
 
     @Mock
     private BudgetRepository budgetRepository;
+
+    @Mock
+    private TransactionRepository transactionRepository;
 
     @InjectMocks
     private BudgetService budgetService;
@@ -83,6 +88,28 @@ class BudgetServiceTest {
         verify(budgetRepository, times(1)).save(budget);
     }
 
+    @Test
+    void updateBudget() {
+        Budget existingBudget = new Budget();
+        existingBudget.setCategory(CategoryType.FOOD);
+        existingBudget.setBudgetLimit(BigDecimal.valueOf(1000));
+        existingBudget.setRemainingAmount(BigDecimal.valueOf(1000));
+
+        Budget updatedBudget = new Budget();
+        updatedBudget.setCategory(CategoryType.FOOD);
+        updatedBudget.setBudgetLimit(BigDecimal.valueOf(2000));
+        updatedBudget.setRemainingAmount(BigDecimal.valueOf(2000));
+
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(existingBudget));
+        when(budgetRepository.save(any(Budget.class))).thenReturn(existingBudget);
+
+        Budget result = budgetService.updateBudget(1L, updatedBudget);
+
+        assertEquals(BigDecimal.valueOf(2000), result.getRemainingAmount());
+        assertEquals(BigDecimal.valueOf(2000), result.getBudgetLimit());
+        verify(budgetRepository, times(1)).findById(1L);
+        verify(budgetRepository, times(1)).save(existingBudget);
+    }
 
 
 }
