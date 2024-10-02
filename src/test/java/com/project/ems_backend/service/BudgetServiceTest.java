@@ -2,6 +2,8 @@ package com.project.ems_backend.service;
 
 import com.project.ems_backend.model.Budget;
 import com.project.ems_backend.model.CategoryType;
+import com.project.ems_backend.model.Transaction;
+import com.project.ems_backend.model.TransactionType;
 import com.project.ems_backend.repository.BudgetRepository;
 import com.project.ems_backend.repository.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,10 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -109,6 +108,24 @@ class BudgetServiceTest {
         assertEquals(BigDecimal.valueOf(2000), result.getBudgetLimit());
         verify(budgetRepository, times(1)).findById(1L);
         verify(budgetRepository, times(1)).save(existingBudget);
+    }
+
+    @Test
+    void updateRemainingAmount() {
+
+        Budget budget = new Budget();
+        budget.setCategory(CategoryType.FOOD);
+        budget.setBudgetLimit(BigDecimal.valueOf(2000));
+
+        List<Transaction> expenses = Arrays.asList(
+                new Transaction(BigDecimal.valueOf(200), TransactionType.EXPENSE, CategoryType.FOOD, "test"),
+                new Transaction(BigDecimal.valueOf(300), TransactionType.EXPENSE, CategoryType.FOOD, "test1")
+        );
+
+        when(transactionRepository.findByCategoryAndType(CategoryType.FOOD, TransactionType.EXPENSE)).thenReturn(expenses);
+
+        budgetService.updateRemainingAmount(budget); // Call the method to update the remaining amount
+        assertEquals(BigDecimal.valueOf(1500), budget.getRemainingAmount()); // Check if the remaining amount is calculated correctly
     }
 
 
