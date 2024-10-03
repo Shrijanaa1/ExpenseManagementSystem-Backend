@@ -197,6 +197,20 @@ class BudgetServiceTest {
     }
 
 
+    @Test
+    void reverseBudgetForTransaction() {
+
+        Transaction transaction = new Transaction(BigDecimal.valueOf(200), TransactionType.EXPENSE, CategoryType.FOOD, "test");
+        Budget budget = new Budget();
+        budget.setBudgetLimit(BigDecimal.valueOf(1000));
+        budget.setRemainingAmount(BigDecimal.valueOf(800)); // Assume expenses already deducted
+        when(budgetRepository.findByCategory(CategoryType.FOOD)).thenReturn(Optional.of(budget));
+
+        budgetService.reverseBudgetForTransaction(transaction);
+
+        verify(budgetRepository, times(1)).save(budget);
+        assertEquals(BigDecimal.valueOf(1000), budget.getRemainingAmount()); //800+200 =1000
+    }
 
 }
 
