@@ -101,7 +101,7 @@ public class BudgetService {
     public void updateBudgetForTransaction(Transaction transaction) {
         if (transaction.getType() == TransactionType.EXPENSE) { // Check if the transaction is an expense
             Budget budget = getBudgetByCategory(transaction.getCategory()); // Get the budget for the same category
-            updateRemainingAmount(budget); // Update the remaining amount in the budget
+            budget.setRemainingAmount(budget.getRemainingAmount().subtract(transaction.getAmount())); // Update the remaining amount in the budget
             saveBudget(budget); //save after updating budget
         }
     }
@@ -110,7 +110,7 @@ public class BudgetService {
     public void reverseBudgetForTransaction(Transaction transaction) {
         if (transaction.getType() == TransactionType.EXPENSE) {
             Budget budget = getBudgetByCategory(transaction.getCategory());
-            updateRemainingAmount(budget);
+            budget.setRemainingAmount(budget.getRemainingAmount().add(transaction.getAmount())); // Add the transaction amount back to the remaining amount
             saveBudget(budget); //Save after reversing
         }
     }
