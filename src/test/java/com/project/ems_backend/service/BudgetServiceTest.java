@@ -161,5 +161,21 @@ class BudgetServiceTest {
         verify(budgetRepository, times(1)).findByCategory(CategoryType.FOOD);
         verify(budgetRepository, times(1)).save(budget);
     }
+
+    @Test
+    void calculateTotalExpensesForCategory() {
+        List<Transaction> transactions = Arrays.asList(
+                new Transaction(BigDecimal.valueOf(200), TransactionType.EXPENSE, CategoryType.ENTERTAINMENT, "test1"),
+                new Transaction(BigDecimal.valueOf(300), TransactionType.EXPENSE, CategoryType.ENTERTAINMENT, "test2")
+        );
+        when(transactionRepository.findByCategoryAndType(CategoryType.ENTERTAINMENT, TransactionType.EXPENSE))
+                .thenReturn(transactions);
+
+        BigDecimal result = budgetService.calculateTotalExpensesForCategory(CategoryType.ENTERTAINMENT);
+
+        assertEquals(BigDecimal.valueOf(500), result);
+        verify(transactionRepository, times(1)).findByCategoryAndType(CategoryType.ENTERTAINMENT, TransactionType.EXPENSE);
+
+    }
 }
 
