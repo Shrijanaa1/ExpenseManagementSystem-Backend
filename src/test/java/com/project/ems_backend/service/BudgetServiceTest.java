@@ -177,5 +177,26 @@ class BudgetServiceTest {
         verify(transactionRepository, times(1)).findByCategoryAndType(CategoryType.ENTERTAINMENT, TransactionType.EXPENSE);
 
     }
+
+    @Test
+    void deleteBudget() {
+        Long budgetId = 1L;
+        budgetService.deleteBudget(budgetId);
+        verify(budgetRepository, times(1)).deleteById(budgetId);
+    }
+
+    @Test
+    void getBudgetByCategory() {
+        Budget budget = new Budget();
+        when(budgetRepository.findByCategory(CategoryType.FOOD)).thenReturn(Optional.of(budget));
+
+        Budget result = budgetService.getBudgetByCategory(CategoryType.FOOD);
+
+        assertNotNull(result);
+        verify(budgetRepository, times(1)).findByCategory(CategoryType.FOOD);
+    }
+
+
+
 }
 
