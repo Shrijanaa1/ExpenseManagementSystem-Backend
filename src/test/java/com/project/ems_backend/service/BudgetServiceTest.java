@@ -145,4 +145,21 @@ class BudgetServiceTest {
         verify(budgetRepository, times(2)).save(any(Budget.class));
     }
 
+    @Test
+    void updateBudgetForTransaction(){
+        Transaction transaction = new Transaction();
+        transaction.setCategory(CategoryType.FOOD);
+        transaction.setType(TransactionType.EXPENSE);
+
+        Budget budget = new Budget();
+        budget.setBudgetLimit(BigDecimal.valueOf(1000));
+
+        when(budgetRepository.findByCategory(CategoryType.FOOD)).thenReturn(Optional.of(budget));
+
+        budgetService.updateBudgetForTransaction(transaction);
+
+        verify(budgetRepository, times(1)).findByCategory(CategoryType.FOOD);
+        verify(budgetRepository, times(1)).save(budget);
+    }
 }
+
