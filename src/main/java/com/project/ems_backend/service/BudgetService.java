@@ -47,7 +47,9 @@ public class BudgetService {
         if (budget.getId() == null) {
             budget.setRemainingAmount(budget.getBudgetLimit());
         }
-        return budgetRepository.save(budget);
+        Budget savedBudget = budgetRepository.save(budget);
+        updateBudgetRemark(savedBudget); // Update remark after saving
+        return savedBudget;
     }
 
     public void deleteBudget(Long id) {
@@ -65,6 +67,9 @@ public class BudgetService {
         // Update remaining amount based on the category's total expenses
         updateRemainingAmount(existingBudget);
 
+        // Update the remark based on the new remaining amount
+        updateBudgetRemark(existingBudget);
+
         return budgetRepository.save(existingBudget);
     }
 
@@ -77,7 +82,9 @@ public class BudgetService {
     public void updateRemainingAmount(Budget budget) {
         BigDecimal totalExpenses = calculateTotalExpensesForCategory(budget.getCategory());
         budget.setRemainingAmount(budget.getBudgetLimit().subtract(totalExpenses));
-//        saveBudget(budget);
+
+        // Logic to update the remark based on remaining amount
+        updateBudgetRemark(budget);
     }
 
     // Calculate total expenses for a specific category
@@ -112,6 +119,19 @@ public class BudgetService {
             Budget budget = getBudgetByCategory(transaction.getCategory());
             budget.setRemainingAmount(budget.getRemainingAmount().add(transaction.getAmount())); // Add the transaction amount back to the remaining amount
             saveBudget(budget); //Save after reversing
+        }
+    }
+
+    private void updateBudgetRemark(Budget budget) {
+        BigDecimal remaining = budget.getRemainingAmount();
+        BigDecimal budgetLimit = budget.getBudgetLimit();
+
+        if (remaining.compareTo(BigDecimal.ZERO) < 0) {
+            budget.setRemark("Overspent"); // Budget exceeded
+        } else if (remaining.compareTo(budgetLimit) < 0) {
+            budget.setRemark("Within Limit"); // Budget is within the allocated limit
+        } else {
+            budget.setRemark("Budget Intact"); // No spending, full budget remains
         }
     }
 }
